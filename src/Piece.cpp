@@ -3,7 +3,7 @@
 Piece::Piece(int x, int y){
     this->x = x;
     this->y = y;
-};
+}
 
 int Piece::getX()
 {

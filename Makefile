@@ -1,17 +1,53 @@
-CC = g++
-CFLAGS = -Wall
-EXEC_NAME = chess
-INCLUDES = 
-LIBS =
-OBJ_FILES = main.o Piece.o
+#
+# **************************************************************
+# *                Simple C++ Makefile Template                *
+# *                                                            *
+# * Author: Arash Partow (2003)                                *
+# * URL: http://www.partow.net/programming/makefile/index.html *
+# *                                                            *
+# * Copyright notice:                                          *
+# * Free use of this C++ Makefile template is permitted under  *
+# * the guidelines and in accordance with the the MIT License  *
+# * http://www.opensource.org/licenses/MIT                     *
+# *                                                            *
+# **************************************************************
+#
 
-all : $(EXEC_NAME)
+CXX      := -gcc
+CXXFLAGS := -pedantic-errors -Wall -Wextra -Werror
+LDFLAGS  := -L/usr/lib -lstdc++ -lm
+BUILD    := ./build
+OBJ_DIR  := $(BUILD)/objects
+APP_DIR  := bin
+TARGET   := program
+INCLUDE  := -Iinclude/
+SRC      := $(wildcard src/**/*.cpp) \
+   			$(wildcard src/*.cpp)
 
-clean :
-	rm $(EXEC_NAME) $(OBJ_FILES)
+OBJECTS := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 
-$(EXEC_NAME) : $(OBJ_FILES)
-	$(CC) -o $(EXEC_NAME) $(OBJ_FILES) $(LIBS)
+all: build $(APP_DIR)/$(TARGET)
 
-%.o: %.cpp
-	$(CC) $(CFLAGS) $(INCLUDES) -o $@ -c $<
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(@D)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ -c $<
+
+$(APP_DIR)/$(TARGET): $(OBJECTS)
+	@mkdir -p $(@D)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $(LDFLAGS) -o $(APP_DIR)/$(TARGET) $(OBJECTS)
+
+.PHONY: all build clean debug release
+
+build:
+	@mkdir -p $(APP_DIR)
+	@mkdir -p $(OBJ_DIR)
+
+debug: CXXFLAGS += -DDEBUG -g
+debug: all
+
+release: CXXFLAGS += -O2
+release: all
+
+clean:
+	-@rm -rvf $(OBJ_DIR)/*
+	-@rm -rvf $(APP_DIR)/*
